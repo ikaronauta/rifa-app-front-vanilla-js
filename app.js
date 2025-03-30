@@ -57,18 +57,30 @@ function listeners() {
           boleta.numero, 
           estados[boleta.estado], 
           '<button class="eliminar">Eliminar</button>']).draw(false);
-      }).catch(error => {
-        console.error('Error:', error);
-      });
+      })
+      .catch(error => {console.error('Error:', error)});
   });
 
   $('#miTabla tbody').on('click', '.eliminar', function () {
-
     if(tabla.rows().count() == 3)
       return alert('La cantidad minima son 3 boletas.');
 
     let fila = $(this).closest('tr'); 
-    tabla.row(fila).remove().draw(false);
+    let idBoleta = tabla.row(fila).data()[0];
+
+    fetch(`http://localhost:3000/remove-boleta-by-id/${idBoleta}`, { 
+      method: 'GET',
+      credentials: 'include'
+     })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+
+          if(data.success)
+            tabla.row(fila).remove().draw(false);
+        }).catch(error => console.error('Error:', error));
+
+    
   });
 }
 
