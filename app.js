@@ -2,7 +2,7 @@ const API_KEY = "4Vj8eK4rloUd272L48hsrarnUA";
 const merchantId = '508029';
 const accountId = '512321';
 const currency = 'COP';
-const confirmationUrl = 'https://9db2-191-156-47-190.ngrok-free.app/payu-confirmation';
+const confirmationUrl = 'https://78e0-191-156-38-116.ngrok-free.app/payu-confirmation';
 
 let boletas, tabla;
 
