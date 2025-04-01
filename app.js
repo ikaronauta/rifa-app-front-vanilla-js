@@ -2,10 +2,9 @@ const API_KEY = "4Vj8eK4rloUd272L48hsrarnUA";
 const merchantId = '508029';
 const accountId = '512321';
 const currency = 'COP';
+const confirmationUrl = 'https://9db2-191-156-47-190.ngrok-free.app/payu-confirmation';
 
 let boletas, tabla;
-
-
 
 const buttonEliminar = $('<button>', {
   class: 'eliminar'
@@ -19,7 +18,28 @@ let estados = {
 
 function inicio() {
 
-  tabla = $('#miTabla').DataTable();
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+
+  debugger;
+
+  if(status == 'success'){
+    $('#main').hide();
+    $('#success').show();
+  }
+    
+
+  tabla = $('#miTabla').DataTable(
+    {
+      columnDefs: [
+        {
+          targets: [2], // Índice de la columna que quieres ocultar (empieza en 0)
+          visible: false, // Oculta la columna
+          searchable: false // Opcional: evita que se busque en esta columna
+        }
+      ]
+    }
+  );
   listeners();
   initBoletas();
 }
@@ -34,6 +54,8 @@ function initBoletas() {
       boletas = data.data;
       console.log(data);
 
+      $('#louderBoletas').hide();
+
       $(boletas).each((a, b) => {
         tabla.row.add([
           b.id,
@@ -43,12 +65,15 @@ function initBoletas() {
         ]).draw(false);
       });
     }).catch(error => {
-      console.error('Error:', error)
+      console.error('Error:', error);
+      $('#louderBoletas').text(`Error: ${error}`);
     });
 }
 
 function listeners() {
-  $('#agregarFila').on('click', () => {
+  $('#agregarBoleta').on('click', () => {
+
+    $('#louderBoletas').text('Agregando boleta...').show();
 
     fetch('http://localhost:3000/', {
       method: 'GET',
@@ -60,18 +85,25 @@ function listeners() {
         let boleta = data.data[0];
         boletas.push(boleta);
 
+        $('#louderBoletas').hide();
+
         tabla.row.add([
           boleta.id,
           boleta.numero,
           estados[boleta.estado],
           '<button class="eliminar">Eliminar</button>']).draw(false);
       })
-      .catch(error => { console.error('Error:', error) });
+      .catch(error => { 
+        console.error('Error:', error);
+        $('#louderBoletas').text(`Error: ${error}`);
+      });
   });
 
   $('#miTabla tbody').on('click', '.eliminar', function () {
     if (tabla.rows().count() == 3)
       return alert('La cantidad minima son 3 boletas.');
+
+    $('#louderBoletas').text('Eliminando boleta...').show();
 
     let fila = $(this).closest('tr');
     let idBoleta = tabla.row(fila).data()[0];
@@ -85,6 +117,7 @@ function listeners() {
         console.log(data);
 
         if (data.success) {
+          $('#louderBoletas').hide();
           tabla.row(fila).remove().draw(false);
 
           let idAEliminar = parseInt(data.data[0].idBoleta);
@@ -94,13 +127,25 @@ function listeners() {
             boletas.splice(index, 1);
         }
 
-      }).catch(error => console.error('Error:', error));
+        $('#louderBoletas').text(`Error: ${error}`);
+
+      }).catch(error => {
+        console.error('Error:', error);
+        $('#louderBoletas').text(`Error: ${error}`);
+      });
   });
 
   $('#pagar').on('click', () => {
     let valorPagar = boletas.length * 10000;
     let message = `Cantidad de boletas: ${boletas.length}. \nValor a pagar: \$${(valorPagar).toLocaleString('es-ES')} pesos.`;
     let referenceCode_ = `RIFA_${Date.now()}`;
+
+    // Obtener los IDs de la primera columna
+    let ids = tabla
+      .column(0) // Seleccionar la primera columna (ID)
+      .data()    // Obtener los datos de la columna
+      .toArray() // Convertir a array normal
+      .join(', '); // Unir los elementos con comas y espacios
 
     if (confirm(message)) {
       // Crear formulario dinámico
@@ -117,7 +162,8 @@ function listeners() {
           currency: currency,
           signature: generateMD5Signature(API_KEY, merchantId, referenceCode_, valorPagar.toFixed(2), currency),
           test: '1', // 1 = Modo sandbox
-          description: `Cantidad de boletas: ${boletas.length}. Valor a pagar: \$${valorPagar.toLocaleString('es-ES')} pesos.`,
+          description: ids,
+          confirmationUrl: confirmationUrl
       };
 
       // Insertar campos en el formulario

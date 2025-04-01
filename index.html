@@ -1,33 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="datatable.css">
     <title>Rifa APP</title>
 </head>
+
 <body>
-    
-    <table id="miTabla" class="display">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Número</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-        </tbody>
-    </table>
-    
-    <button id="agregarFila">Agregar Boleta</button>
-    <button id="pagar">Pagar</button>
+    <div id="main">
+        <p id="louderBoletas">Concultando boletas....</p>
+        <table id="miTabla" class="display">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Número</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+
+        <button id="agregarBoleta">Agregar Boleta</button>
+        <button id="pagar">Pagar</button>
+    </div>
+
+    <div id="success" style="display: none;">
+        <h1>Gracias por su compra</h1>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="jquery.js"></script>
     <script src="datatable.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>
