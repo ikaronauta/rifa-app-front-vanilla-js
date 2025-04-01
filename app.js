@@ -2,7 +2,8 @@ const API_KEY = "4Vj8eK4rloUd272L48hsrarnUA";
 const merchantId = '508029';
 const accountId = '512321';
 const currency = 'COP';
-const confirmationUrl = 'https://78e0-191-156-38-116.ngrok-free.app/payu-confirmation';
+const baseUrl = 'https://78e0-191-156-38-116.ngrok-free.app';
+const confirmationUrl = `${baseUrl}/payu-confirmation`;
 
 let boletas, tabla;
 
@@ -45,7 +46,7 @@ function inicio() {
 }
 
 function initBoletas() {
-  fetch('http://localhost:3000/', {
+  fetch(baseUrl, {
     method: 'GET',
     credentials: 'include'
   })
@@ -75,7 +76,7 @@ function listeners() {
 
     $('#louderBoletas').text('Agregando boleta...').show();
 
-    fetch('http://localhost:3000/', {
+    fetch(baseUrl, {
       method: 'GET',
       credentials: 'include'
     })
@@ -108,7 +109,7 @@ function listeners() {
     let fila = $(this).closest('tr');
     let idBoleta = tabla.row(fila).data()[0];
 
-    fetch(`http://localhost:3000/remove-boleta-by-id/${idBoleta}`, {
+    fetch(`${baseUrl}/remove-boleta-by-id/${idBoleta}`, {
       method: 'GET',
       credentials: 'include'
     })
